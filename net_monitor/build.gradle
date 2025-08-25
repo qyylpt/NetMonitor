@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
+}
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.50"
+    api 'com.squareup.okhttp3:okhttp:3.10.0'
+}
+
+// 配置Maven发布
+afterEvaluate {
+    publishing {
+        publications {
+            // 创建一个名为release的发布
+            release(MavenPublication) {
+                // 关联Android库组件
+                from components.release
+
+                groupId = 'com.qihoo.net.monitor'
+                artifactId = 'net_monitor'
+                version = android.defaultConfig.versionName
+            }
+
+            debug(MavenPublication) {
+                // 关联Android库组件
+                from components.debug
+
+                // 配置Maven坐标信息
+                groupId = 'com.qihoo.net.monitor'
+                artifactId = 'net_monitor_debug'
+                version = android.defaultConfig.versionName
+            }
+        }
+
+        // 配置发布仓库
+        repositories {
+            // 本地Maven ~/.m2/repository
+            mavenLocal()
+
+            // 远程Maven仓库（替换为你的仓库信息）
+            maven {
+                url = uri('https://your-maven-repo-url') // 仓库URL
+                credentials {
+                    username = 'your-username' // 用户名
+                    password = 'your-password' // 密码
+                }
+            }
+        }
+    }
+}
