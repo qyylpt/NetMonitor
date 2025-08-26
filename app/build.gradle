@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'net_monitor_plugin'
 }
 
 android {
@@ -8,9 +9,9 @@ android {
     buildToolsVersion "30.0.0"
 
     defaultConfig {
-        applicationId "com.qihoo.net.monitor"
+        applicationId "com.qihoo.net.monitor.demo"
         minSdkVersion 16
-        targetSdkVersion 30
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
 
@@ -35,4 +36,11 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    api 'com.squareup.okhttp3:okhttp:3.10.0'
+//    implementation project(':net_monitor')
+
+
+    implementation "com.qihoo.net.monitor:net_monitor_debug:1.0"
+
 }

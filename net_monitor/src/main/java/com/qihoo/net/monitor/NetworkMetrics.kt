@@ -41,7 +41,7 @@ data class NetworkMetrics(
     val networkEnv: NetworkEnv,
 
     // 设备与系统
-    val deviceInfo: DeviceInfo,
+    val deviceInfo: DeviceInfo?,
 
     // 扩展信息
     val retryCount: Int,

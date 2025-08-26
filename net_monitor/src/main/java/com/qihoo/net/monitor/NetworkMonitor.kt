@@ -1,6 +1,7 @@
 package com.qihoo.net.monitor
 
 import android.app.ActivityManager
+import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
@@ -13,10 +14,13 @@ import android.util.Log
 object NetworkMonitor {
 
     private var networkSignalHelper: NetworkSignalHelper? = null
-    fun init(context: Context) {
+    private var application: Application? = null
+
+    fun init(application: Application) {
         if (networkSignalHelper == null) {
-            networkSignalHelper = NetworkSignalHelper(context)
+            networkSignalHelper = NetworkSignalHelper(application.applicationContext)
         }
+        this.application = application
     }
 
     // 上报指标
@@ -25,9 +29,12 @@ object NetworkMonitor {
     }
 
     // 获取设备信息
-    internal fun getDeviceInfo(context: Context): DeviceInfo {
+    internal fun getDeviceInfo(): DeviceInfo? {
+        if (application == null) {
+            return null
+        }
         val packageInfo = try {
-            context.packageManager.getPackageInfo(context.packageName, 0)
+            application!!.packageManager.getPackageInfo(application!!.packageName, 0)
         } catch (e: PackageManager.NameNotFoundException) {
             null
         }
@@ -36,7 +43,7 @@ object NetworkMonitor {
             appVersion = packageInfo?.versionName ?: "Unknown",
             deviceModel = "${Build.MANUFACTURER} ${Build.MODEL}",
             osVersion = "Android ${Build.VERSION.RELEASE}",
-            deviceMemory = getTotalMemory(context)
+            deviceMemory = getTotalMemory(application!!)
         )
     }
 
@@ -49,8 +56,8 @@ object NetworkMonitor {
     }
 
     // 获取网络环境信息
-    internal fun getNetworkEnv(context: Context): NetworkEnv {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    internal fun getNetworkEnv(): NetworkEnv {
+        val cm = application?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val network = cm.activeNetwork ?: return NetworkEnv("UNKNOWN", null, null)
             val capabilities = cm.getNetworkCapabilities(network)
@@ -63,7 +70,7 @@ object NetworkMonitor {
             }
             val signalStrength = when (networkType) {
                 "WIFI" -> {
-                    val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    val wifiManager = application?.applicationContext?.getSystemService(Context.WIFI_SERVICE) as WifiManager
                     wifiManager.connectionInfo.rssi
                 }
 
@@ -74,7 +81,7 @@ object NetworkMonitor {
                 else -> -1
             }
             val carrier = if (networkType == "CELLULAR") {
-                val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                val telephonyManager = application?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                 val simOperator = telephonyManager.simOperator
                 if ("46001" == simOperator || "46006" == simOperator || "46009" == simOperator) {
                     "中国联通"

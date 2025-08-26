@@ -1,6 +1,6 @@
 package com.qihoo.net.monitor
 
-import android.content.Context
+import android.util.Log
 import okhttp3.Call
 import okhttp3.EventListener
 import okhttp3.Handshake
@@ -12,7 +12,11 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
 
-class NetworkEventListener(private val context: Context) : EventListener() {
+class NetworkEventListener() : EventListener() {
+
+    companion object {
+        const val TAG = "NetworkEventListener"
+    }
     private var requestId: String = ""
     private var startTime: Long = 0
     private var dnsStartTime: Long = 0
@@ -25,24 +29,27 @@ class NetworkEventListener(private val context: Context) : EventListener() {
     private var redirectCount = 0
     private var previousRequestUrl: String? = null
 
-    class Factory(private val context: Context) : EventListener.Factory {
+    class Factory() : EventListener.Factory {
         override fun create(call: Call): EventListener {
-            return NetworkEventListener(context)
+            return NetworkEventListener()
         }
     }
 
     override fun requestBodyEnd(call: Call, byteCount: Long) {
+        Log.i(TAG, "requestBodyEnd")
         // 记录请求体大小
         MetricsHolder.setRequestSize(requestId, byteCount)
     }
 
     override fun responseBodyEnd(call: Call, byteCount: Long) {
+        Log.i(TAG, "responseBodyEnd")
         // 记录响应体大小
         MetricsHolder.setResponseSize(requestId, byteCount)
     }
 
 
     override fun callStart(call: Call) {
+        Log.i(TAG, "callStart")
         startTime = System.currentTimeMillis()
         dnsStartTime = 0
         connectStartTime = 0
@@ -57,10 +64,12 @@ class NetworkEventListener(private val context: Context) : EventListener() {
     }
 
     override fun dnsStart(call: Call, domainName: String) {
+        Log.i(TAG, "dnsStart")
         dnsStartTime = System.nanoTime()
     }
 
     override fun dnsEnd(call: Call, domainName: String, inetAddressList: List<InetAddress>) {
+        Log.i(TAG, "dnsEnd")
         val dnsTime = if (dnsStartTime > 0) {
             (System.nanoTime() - dnsStartTime) / 1000000 // 手动转换纳秒到毫秒
         } else -1
@@ -68,14 +77,17 @@ class NetworkEventListener(private val context: Context) : EventListener() {
     }
 
     override fun connectStart(call: Call, inetSocketAddress: InetSocketAddress, proxy: Proxy) {
+        Log.i(TAG, "connectStart")
         connectStartTime = System.nanoTime()
     }
 
     override fun secureConnectStart(call: Call) {
+        Log.i(TAG, "secureConnectStart")
         secureConnectStartTime = System.nanoTime()
     }
 
     override fun secureConnectEnd(call: Call, handshake: Handshake?) {
+        Log.i(TAG, "secureConnectEnd")
         val sslTime = if (secureConnectStartTime > 0) {
             (System.nanoTime() - secureConnectStartTime) / 1000000
         } else -1
@@ -88,6 +100,7 @@ class NetworkEventListener(private val context: Context) : EventListener() {
         proxy: Proxy,
         protocol: Protocol?
     ) {
+        Log.i(TAG, "connectEnd")
         val connectTime = if (connectStartTime > 0) {
             (System.nanoTime() - connectStartTime) / 1000000
         } else -1
@@ -95,10 +108,12 @@ class NetworkEventListener(private val context: Context) : EventListener() {
     }
 
     override fun responseHeadersStart(call: Call) {
+        Log.i(TAG, "responseHeadersStart")
         firstByteTime = System.currentTimeMillis()
     }
 
     override fun responseHeadersEnd(call: Call, response: Response) {
+        Log.i(TAG, "responseHeadersEnd")
         val ttfb = if (startTime > 0 && firstByteTime > 0) {
             firstByteTime - startTime
         } else -1
@@ -113,6 +128,7 @@ class NetworkEventListener(private val context: Context) : EventListener() {
 
     // 兼容 OkHttp 3.x：通过 requestHeadersEnd 检测重定向
     override fun requestHeadersEnd(call: Call, request: Request) {
+        Log.i(TAG, "requestHeadersEnd")
         val currentUrl = request.url().toString()
         if (previousRequestUrl != null && currentUrl != previousRequestUrl) {
             redirectCount++
@@ -122,6 +138,7 @@ class NetworkEventListener(private val context: Context) : EventListener() {
     }
 
     override fun callFailed(call: Call, ioe: IOException) {
+        Log.i(TAG, "callFailed")
         success = false
         errorMessage = ioe.message
         MetricsHolder.setSuccessState(requestId, false)
@@ -130,6 +147,7 @@ class NetworkEventListener(private val context: Context) : EventListener() {
     }
 
     override fun callEnd(call: Call) {
+        Log.i(TAG, "callEnd")
         val totalTime = System.currentTimeMillis() - startTime
         reportMetrics(call, totalTime)
     }
@@ -160,8 +178,8 @@ class NetworkEventListener(private val context: Context) : EventListener() {
             success = success,
             responseCode = responseCode,
             errorMessage = error,
-            networkEnv = NetworkMonitor.getNetworkEnv(context),
-            deviceInfo = NetworkMonitor.getDeviceInfo(context),
+            networkEnv = NetworkMonitor.getNetworkEnv(),
+            deviceInfo = NetworkMonitor.getDeviceInfo(),
             retryCount = retryCount,
             redirectCount = redirectCount
         )
