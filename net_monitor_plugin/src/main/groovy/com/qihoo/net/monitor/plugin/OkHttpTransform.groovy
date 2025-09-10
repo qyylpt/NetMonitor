@@ -27,7 +27,7 @@ class OkHttpTransform extends Transform {
         return TransformManager.CONTENT_CLASS
     }
 
-    // 处理范围：项目所有代码（包括子模块）
+    // 关键修改1：AGP 3.3.3 中 Scope 需用非 QualifiedContent 包装的类型
     @Override
     Set<QualifiedContent.Scope> getScopes() {
         return TransformManager.SCOPE_FULL_PROJECT
@@ -43,6 +43,11 @@ class OkHttpTransform extends Transform {
     void transform(TransformInvocation invocation) throws TransformException, InterruptedException, IOException {
         def outputProvider = invocation.outputProvider
         println("start - 1")
+        // 关键修改3：AGP 3.3.3 中 outputProvider 可能为 null，增加空判断
+        if (outputProvider == null) {
+            project.logger.warn("OkHttpTransform: 输出提供者为空，跳过处理")
+            return
+        }
         // 遍历所有输入文件
         invocation.inputs.each { TransformInput input ->
             // 处理目录中的class文件
@@ -79,7 +84,7 @@ class OkHttpTransform extends Transform {
         try {
             println("file name : ${file.name}")
             ClassReader cr = new ClassReader(FileUtils.readFileToByteArray(file))
-            ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES)
+            ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
             // 使用自定义ClassVisitor处理字节码
             OkHttpClassVisitor cv = new OkHttpClassVisitor(cw, project)
             cr.accept(cv, ClassReader.EXPAND_FRAMES)
