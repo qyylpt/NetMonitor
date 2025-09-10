@@ -11,6 +11,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/app_lib" />
             <option value="$PROJECT_DIR$/net_monitor" />
             <option value="$PROJECT_DIR$/net_monitor_plugin" />
           </set>

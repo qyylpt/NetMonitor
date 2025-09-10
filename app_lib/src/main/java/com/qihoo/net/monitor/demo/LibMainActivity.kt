@@ -5,22 +5,39 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import com.qihoo.net.monitor.NetworkMonitor
+import com.qihoo.net.monitor.lib.R
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
-class MainActivity : FragmentActivity() {
+class LibMainActivity : FragmentActivity() {
     private var client: OkHttpClient? = null
     private var client1: OkHttpClient? = null
+    private var client2: OkHttpClient? = null
+    private var client3: OkHttpClient? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         NetworkMonitor.init(application)
-        client = OkHttpClient.Builder().build()
-        client1 = OkHttpClient().newBuilder().build()
+
+        client1 = OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+
+        client = OkHttpClient.Builder()
+            .build()
+        client2 = OkHttpClient().newBuilder().build()
+        client3 = OkHttpClient().newBuilder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS).build()
         findViewById<View>(R.id.monitor_request).setOnClickListener { // 发起请求
             client?.newCall(
                 Request.Builder()

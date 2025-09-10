@@ -1,4 +1,5 @@
 rootProject.name = "NetMonitor"
 include ':app'
+include ':app_lib'
 include ':net_monitor'
 include ':net_monitor_plugin'

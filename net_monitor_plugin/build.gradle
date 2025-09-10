@@ -24,7 +24,7 @@ publishing {
         NetMonitorPlugin(MavenPublication) {
             groupId = 'com.qihoo.net.monitor.plugin'
             artifactId = 'net_monitor_plugin'
-            version = '7.0.0'
+            version = '1.0.0'
             // 组件类型，我们的插件其实就是Java组件
             from components.java
         }
