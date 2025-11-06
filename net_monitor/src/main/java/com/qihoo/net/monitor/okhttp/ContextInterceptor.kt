@@ -1,5 +1,6 @@
-package com.qihoo.net.monitor
+package com.qihoo.net.monitor.okhttp
 
+import com.qihoo.net.monitor.MetricsHolder
 import okhttp3.Interceptor
 import okhttp3.Response
 
