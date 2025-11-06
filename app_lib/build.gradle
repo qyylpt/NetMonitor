@@ -36,9 +36,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     api 'com.squareup.okhttp3:okhttp:3.10.0'
-//    implementation project(':net_monitor')
 
-
-    implementation "com.qihoo.net.monitor:net_monitor_debug:1.0"
-
+    implementation project(':net_monitor')
+//    implementation "com.qihoo.net.monitor:net_monitor_debug:2.0"
 }

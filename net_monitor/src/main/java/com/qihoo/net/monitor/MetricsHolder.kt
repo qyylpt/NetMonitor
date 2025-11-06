@@ -21,6 +21,11 @@ object MetricsHolder {
     // 存储 Call 实例与 requestId 的映射（key: Call实例，value: 唯一请求ID）
     private val callToRequestId = ConcurrentHashMap<Call, String>()
 
+
+    private val connectionToRequestId = ConcurrentHashMap<Any, String>()  // 新增：存储原生连接
+    // 对外提供连接映射表操作
+    internal fun getConnectionMap() = connectionToRequestId  // 新增
+
     /**
      * 获取 Call 对应的 requestId（首次调用时自动生成）
      */
@@ -41,7 +46,7 @@ object MetricsHolder {
     /**
      * 生成唯一 requestId（UUID 确保全局唯一）
      */
-    private fun generateRequestId(): String {
+    fun generateRequestId(): String {
         return "REQ-${System.currentTimeMillis()}-${UUID.randomUUID()}"
     }
 
