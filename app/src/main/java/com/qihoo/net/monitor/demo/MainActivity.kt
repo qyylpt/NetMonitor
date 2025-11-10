@@ -38,8 +38,8 @@ class MainActivity : FragmentActivity() {
                 val url = URL("https://suggest.taobao.com/sug?code=utf-8&q=%E5%8D%AB%E8%A1%A3&callback=cb")
                 val connection = MonitoredHttpURLConnection(url)
                 connection.requestMethod = "GET"
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
+                connection.connectTimeout = 10000
+                connection.readTimeout = 10000
 
                 val responseCode = connection.responseCode
                 if (responseCode == 200) {
