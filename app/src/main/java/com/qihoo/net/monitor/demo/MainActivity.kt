@@ -24,35 +24,35 @@ class MainActivity : FragmentActivity() {
         client = OkHttpClient.Builder().build()
         client1 = OkHttpClient().newBuilder().build()
         findViewById<View>(R.id.monitor_request).setOnClickListener {
-            simulateOkhttp()
-            simulateHttpUrl()
-
+//            simulateOkhttp()
+//            simulateHttpUrl()
+            Thread {
+                Test.testHttpUrl()
+            }.start()
         }
 
 
     }
 
     private fun simulateHttpUrl() {
-        Thread {
-            try {
-                val url = URL("https://suggest.taobao.com/sug?code=utf-8&q=%E5%8D%AB%E8%A1%A3&callback=cb")
-                val connection = MonitoredHttpURLConnection(url)
-                connection.requestMethod = "GET"
-                connection.connectTimeout = 10000
-                connection.readTimeout = 10000
+        try {
+            val url = URL("https://suggest.taobao.com/sug?code=utf-8&q=%E5%8D%AB%E8%A1%A3&callback=cb")
+            val connection = MonitoredHttpURLConnection(url)
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 10000
+            connection.readTimeout = 10000
 
-                val responseCode = connection.responseCode
-                if (responseCode == 200) {
-                    val inputStream = connection.inputStream
-                    val response = inputStream.bufferedReader().readText()
-                    Log.d("HttpURLTest", "响应内容: $response")
-                    inputStream.close()
-                }
-                connection.disconnect()
-            } catch (e: Exception) {
-                Log.e("HttpURLTest", "请求失败", e)
+            val responseCode = connection.responseCode
+            if (responseCode == 200) {
+                val inputStream = connection.inputStream
+                val response = inputStream.bufferedReader().readText()
+                Log.d("HttpURLTest", "响应内容: $response")
+                inputStream.close()
             }
-        }.start()
+            connection.disconnect()
+        } catch (e: Exception) {
+            Log.e("HttpURLTest", "请求失败", e)
+        }
     }
 
     private fun simulateOkhttp() {

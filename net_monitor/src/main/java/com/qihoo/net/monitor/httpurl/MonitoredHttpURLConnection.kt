@@ -16,13 +16,14 @@ import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
 class MonitoredHttpURLConnection(
-    url: URL,
-    private val delegate: HttpURLConnection = url.openConnection() as HttpURLConnection
+    url: URL
 ) : HttpURLConnection(url) {
 
     companion object {
         private const val TAG = "MonitoredHttpURL"
     }
+
+    private val delegate: HttpURLConnection = url.openConnection() as HttpURLConnection
 
     private val requestId = MetricsHolder.generateRequestId()
 

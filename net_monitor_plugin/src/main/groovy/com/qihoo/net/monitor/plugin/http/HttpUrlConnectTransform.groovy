@@ -1,8 +1,8 @@
-package com.qihoo.net.monitor.plugin
+package com.qihoo.net.monitor.plugin.http
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.qihoo.net.monitor.plugin.asm.OkHttpClassVisitor
+import com.qihoo.net.monitor.plugin.http.asm.HttpUrlConnectionClassVisitor
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
@@ -12,10 +12,10 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
-class OkHttpTransform extends Transform {
+class HttpUrlConnectTransform extends Transform {
     private final Project project
 
-    OkHttpTransform(Project project) {
+    HttpUrlConnectTransform(Project project) {
         this.project = project
     }
 
@@ -201,7 +201,7 @@ class OkHttpTransform extends Transform {
         try {
             ClassReader cr = new ClassReader(originalBytes)
             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-            OkHttpClassVisitor cv = new OkHttpClassVisitor(cw, project)
+            HttpUrlConnectionClassVisitor cv = new HttpUrlConnectionClassVisitor(cw, project)
             cr.accept(cv, ClassReader.EXPAND_FRAMES)
             return cw.toByteArray()
         } catch (Exception e) {

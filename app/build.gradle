@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'net_monitor_plugin'
+//    id 'http_url_connection_plugin'
 }
 
 android {

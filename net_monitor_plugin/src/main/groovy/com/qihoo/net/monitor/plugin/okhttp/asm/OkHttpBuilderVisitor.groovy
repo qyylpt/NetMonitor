@@ -1,4 +1,4 @@
-package com.qihoo.net.monitor.plugin.asm
+package com.qihoo.net.monitor.plugin.okhttp.asm
 
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -9,8 +9,11 @@ class OkHttpBuilderVisitor extends AdviceAdapter {
     // 用于跟踪当前是否在处理一个Builder实例（解决多个Builder的问题）
     private boolean isInsideBuilderChain = false
 
-    protected OkHttpBuilderVisitor(int api, MethodVisitor mv, int access, String name, String desc) {
+    private String currentClassName
+
+    protected OkHttpBuilderVisitor(int api, MethodVisitor mv, int access, String name, String desc, String currentClassName) {
         super(api, mv, access, name, desc)
+        this.currentClassName = currentClassName
     }
 
     @Override

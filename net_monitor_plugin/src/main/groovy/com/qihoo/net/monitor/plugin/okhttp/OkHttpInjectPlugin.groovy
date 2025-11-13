@@ -1,4 +1,4 @@
-package com.qihoo.net.monitor.plugin
+package com.qihoo.net.monitor.plugin.okhttp
 
 import com.android.build.gradle.AppExtension
 import org.gradle.api.Plugin
