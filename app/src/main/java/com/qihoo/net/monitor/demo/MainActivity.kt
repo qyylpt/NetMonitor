@@ -19,6 +19,7 @@ class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.qihoo.net.monitor.socket.NetworkMonitor.init(application)
         setContentView(R.layout.activity_main)
         NetworkMonitor.init(application)
         client = OkHttpClient.Builder().build()
