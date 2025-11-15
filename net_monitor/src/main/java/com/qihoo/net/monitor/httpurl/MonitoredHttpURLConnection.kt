@@ -21,6 +21,11 @@ class MonitoredHttpURLConnection(
 
     companion object {
         private const val TAG = "MonitoredHttpURL"
+
+        @JvmStatic
+        fun getHttpURLConnection(url: URL): HttpURLConnection {
+            return MonitoredHttpURLConnection(url)
+        }
     }
 
     private val delegate: HttpURLConnection = url.openConnection() as HttpURLConnection
@@ -28,7 +33,6 @@ class MonitoredHttpURLConnection(
     private val requestId = MetricsHolder.generateRequestId()
 
     // 整体调用时间
-    private var callStart: Long = System.nanoTime()  // 整个调用开始时间
     private var monitorInitTime: Long = 0 // 监控初始化时间
 
     // 连接相关时间点
@@ -343,7 +347,7 @@ class MonitoredHttpURLConnection(
         initMonitorIfNeed()
         val value = delegate.getHeaderField(name)
         markResponseHeadersReceived()
-        return value
+        return value ?: ""
     }
 
     override fun getHeaderFields(): Map<String, List<String>> {

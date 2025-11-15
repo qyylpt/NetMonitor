@@ -1,23 +1,25 @@
-package com.qihoo.net.monitor.plugin.okhttp.asm
+package com.qihoo.net.monitor.plugin
+
 
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.commons.AdviceAdapter
 
-class OkHttpBuilderVisitor extends AdviceAdapter {
+class NetBuilderVisitor extends AdviceAdapter {
     private boolean inserted = false
     // 用于跟踪当前是否在处理一个Builder实例（解决多个Builder的问题）
     private boolean isInsideBuilderChain = false
 
     private String currentClassName
 
-    protected OkHttpBuilderVisitor(int api, MethodVisitor mv, int access, String name, String desc, String currentClassName) {
+    protected NetBuilderVisitor(int api, MethodVisitor mv, int access, String name, String desc, String currentClassName) {
         super(api, mv, access, name, desc)
         this.currentClassName = currentClassName
     }
 
     @Override
     void visitTypeInsn(int opcode, String type) {
+
         // 1. new OkHttpClient.Builder()
         if (opcode == Opcodes.NEW && type == 'okhttp3/OkHttpClient$Builder') {
             isInsideBuilderChain = true
@@ -33,6 +35,23 @@ class OkHttpBuilderVisitor extends AdviceAdapter {
 
     @Override
     void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface) {
+
+        if (opcode == Opcodes.INVOKEVIRTUAL &&
+                owner == 'java/net/URL' &&
+                name == 'openConnection' &&
+                desc == '()Ljava/net/URLConnection;' &&
+                !"com/qihoo/net/monitor/httpurl/MonitoredHttpURLConnection".equals(currentClassName)) {
+            LogUtils.logHttp("$currentClassName -> $name -> $desc")
+            super.visitMethodInsn(
+                    Opcodes.INVOKESTATIC,
+                    "com/qihoo/net/monitor/httpurl/MonitoredHttpURLConnection",  // 替换为实际包名
+                    "getHttpURLConnection",
+                    "(Ljava/net/URL;)Ljava/net/HttpURLConnection;",
+                    false
+            );
+            return
+        }
+
         if (opcode == Opcodes.INVOKEVIRTUAL &&
                 owner == 'okhttp3/OkHttpClient' &&
                 name == 'newBuilder' &&
@@ -53,6 +72,7 @@ class OkHttpBuilderVisitor extends AdviceAdapter {
             // 匹配build()方法，插入代码（所有场景共用）
             if (!inserted && name == 'build' && desc.startsWith('()Lokhttp3/OkHttpClient')) {
                 println("匹配到build() -> 开始插入拦截器和监听器")
+                LogUtils.logOkhttp("$currentClassName -> $name -> $desc")
                 insertBeforeBuild()
                 inserted = true
             }

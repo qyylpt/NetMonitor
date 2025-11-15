@@ -1,8 +1,7 @@
-package com.qihoo.net.monitor.plugin.http
+package com.qihoo.net.monitor.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.qihoo.net.monitor.plugin.http.asm.HttpUrlConnectionClassVisitor
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
@@ -12,16 +11,16 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
-class HttpUrlConnectTransform extends Transform {
+class NetTransform extends Transform {
     private final Project project
 
-    HttpUrlConnectTransform(Project project) {
+    NetTransform(Project project) {
         this.project = project
     }
 
     @Override
     String getName() {
-        return "OkHttpInjectTransform"
+        return "NetInjectTransform"
     }
 
     @Override
@@ -48,12 +47,13 @@ class HttpUrlConnectTransform extends Transform {
 
     @Override
     void transform(TransformInvocation invocation) throws TransformException, InterruptedException, IOException {
+        LogUtils.init(project)
         def outputProvider = invocation.outputProvider
-        project.logger.lifecycle("开始执行 OkHttpTransform（模块：${project.name}）")
+        project.logger.lifecycle("开始执行 NetTransform（模块：${project.name}）")
 
         // 1. 空判断与清理输出（避免旧文件残留）
         if (outputProvider == null) {
-            project.logger.warn("OkHttpTransform: 输出提供者为空，跳过处理")
+            project.logger.warn("NetTransform: 输出提供者为空，跳过处理")
             return
         }
         outputProvider.deleteAll() // 每次构建前清空输出目录
@@ -66,7 +66,7 @@ class HttpUrlConnectTransform extends Transform {
             handleJarInput(input.jarInputs, outputProvider)
         }
 
-        project.logger.lifecycle("OkHttpTransform 执行完成（模块：${project.name}）")
+        project.logger.lifecycle("NetTransform 执行完成（模块：${project.name}）")
     }
 
     // ------------------------------ 目录输入处理 ------------------------------
@@ -201,7 +201,7 @@ class HttpUrlConnectTransform extends Transform {
         try {
             ClassReader cr = new ClassReader(originalBytes)
             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-            HttpUrlConnectionClassVisitor cv = new HttpUrlConnectionClassVisitor(cw, project)
+            NetClassVisitor cv = new NetClassVisitor(cw, project)
             cr.accept(cv, ClassReader.EXPAND_FRAMES)
             return cw.toByteArray()
         } catch (Exception e) {

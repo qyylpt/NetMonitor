@@ -11,7 +11,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.net.HttpURLConnection
 import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class MainActivity : FragmentActivity() {
     private var client: OkHttpClient? = null
@@ -24,10 +26,11 @@ class MainActivity : FragmentActivity() {
         client = OkHttpClient.Builder().build()
         client1 = OkHttpClient().newBuilder().build()
         findViewById<View>(R.id.monitor_request).setOnClickListener {
-//            simulateOkhttp()
-//            simulateHttpUrl()
+            simulateOkhttp()
             Thread {
                 Test.testHttpUrl()
+                simulateHttpUrl()
+                Test.testVolley(this@MainActivity)
             }.start()
         }
 
@@ -37,7 +40,7 @@ class MainActivity : FragmentActivity() {
     private fun simulateHttpUrl() {
         try {
             val url = URL("https://suggest.taobao.com/sug?code=utf-8&q=%E5%8D%AB%E8%A1%A3&callback=cb")
-            val connection = MonitoredHttpURLConnection(url)
+            val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
             connection.connectTimeout = 10000
             connection.readTimeout = 10000

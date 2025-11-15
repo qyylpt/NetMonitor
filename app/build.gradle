@@ -41,8 +41,10 @@ dependencies {
     api 'com.squareup.okhttp3:okhttp:3.10.0'
 
 
-//    implementation "com.qihoo.net.monitor:net_monitor_debug:2.0"
-    implementation project(':net_monitor')
+    implementation "com.qihoo.net.monitor:net_monitor_debug:2.0"
+//    implementation project(':net_monitor')
     implementation project(':app_lib')
+
+    implementation 'com.android.volley:volley:1.2.1'
 
 }

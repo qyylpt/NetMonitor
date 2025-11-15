@@ -1,16 +1,16 @@
-package com.qihoo.net.monitor.plugin.okhttp.asm
+package com.qihoo.net.monitor.plugin
 
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.gradle.api.Project
 
-class OkHttpClassVisitor extends ClassVisitor {
+class NetClassVisitor extends ClassVisitor {
     private final Project project
     // 保存当前处理的类名
     private String currentClassName
 
-    OkHttpClassVisitor(ClassVisitor cv, Project project) {
+    NetClassVisitor(ClassVisitor cv, Project project) {
         super(Opcodes.ASM7, cv)
         this.project = project
     }
@@ -25,6 +25,6 @@ class OkHttpClassVisitor extends ClassVisitor {
     @Override
     MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions)
-        return new OkHttpBuilderVisitor(Opcodes.ASM7, mv, access, name, desc, currentClassName)
+        return new NetBuilderVisitor(Opcodes.ASM7, mv, access, name, desc, currentClassName)
     }
 }

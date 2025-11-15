@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
-import com.qihoo.net.monitor.NetworkMonitor
 import com.qihoo.net.monitor.lib.R
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.TimeUnit
 
 class LibMainActivity : FragmentActivity() {
@@ -22,8 +23,6 @@ class LibMainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        NetworkMonitor.init(application)
 
         client1 = OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
@@ -66,7 +65,30 @@ class LibMainActivity : FragmentActivity() {
 
             })
         }
+        Thread {
+            simulateHttpUrl()
+        } .start()
 
+    }
 
+    private fun simulateHttpUrl() {
+        try {
+            val url = URL("https://suggest.taobao.com/sug?code=utf-8&q=%E5%8D%AB%E8%A1%A3&callback=cb")
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 10000
+            connection.readTimeout = 10000
+
+            val responseCode = connection.responseCode
+            if (responseCode == 200) {
+                val inputStream = connection.inputStream
+                val response = inputStream.bufferedReader().readText()
+                Log.d("HttpURLTest", "响应内容: $response")
+                inputStream.close()
+            }
+            connection.disconnect()
+        } catch (e: Exception) {
+            Log.e("HttpURLTest", "请求失败", e)
+        }
     }
 }
