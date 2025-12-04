@@ -24,11 +24,11 @@ class NetBuilderVisitor extends AdviceAdapter {
         if (opcode == Opcodes.NEW && type == 'okhttp3/OkHttpClient$Builder') {
             isInsideBuilderChain = true
             inserted = false  // 新Builder实例，重置插入标记
-            println("跟踪到：直接创建Builder -> new OkHttpClient.Builder()")
+//            println("跟踪到：直接创建Builder -> new OkHttpClient.Builder()")
         }
         // 2. new OkHttpClient()（用于后续调用newBuilder()）
         if (opcode == Opcodes.NEW && type == 'okhttp3/OkHttpClient') {
-            println("跟踪到：创建OkHttpClient实例 -> 准备调用newBuilder()")
+//            println("跟踪到：创建OkHttpClient实例 -> 准备调用newBuilder()")
         }
         super.visitTypeInsn(opcode, type)
     }
@@ -59,19 +59,18 @@ class NetBuilderVisitor extends AdviceAdapter {
 
             isInsideBuilderChain = true  // 标记进入Builder链（newBuilder()返回的Builder）
             inserted = false             // 新Builder实例，重置插入标记
-            println("跟踪到：通过newBuilder()创建Builder -> OkHttpClient().newBuilder()")
+//            println("跟踪到：通过newBuilder()创建Builder -> OkHttpClient().newBuilder()")
         }
 
-        // 原有逻辑：跟踪Builder链中的方法调用（兼容所有场景的后续链式调用）
+        // 跟踪Builder链中的方法调用（兼容所有场景的后续链式调用）
         if (owner == 'okhttp3/OkHttpClient$Builder') {
-            println("Builder链方法：opcode=${opcode}, name=${name}, desc=${desc}, 跟踪中=${isInsideBuilderChain}")
+//            println("Builder链方法：opcode=${opcode}, name=${name}, desc=${desc}, 跟踪中=${isInsideBuilderChain}")
         }
 
         // 仅处理处于Builder链中的方法（无论Builder是哪种方式创建的）
         if (isInsideBuilderChain && owner == 'okhttp3/OkHttpClient$Builder') {
             // 匹配build()方法，插入代码（所有场景共用）
             if (!inserted && name == 'build' && desc.startsWith('()Lokhttp3/OkHttpClient')) {
-                println("匹配到build() -> 开始插入拦截器和监听器")
                 LogUtils.logOkhttp("$currentClassName -> $name -> $desc")
                 insertBeforeBuild()
                 inserted = true

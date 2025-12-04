@@ -24,9 +24,9 @@ allprojects {
         mavenCentral()
         jcenter() // Warning: this repository is going to shut down soon
         mavenLocal()
-        maven {
-            url "http://s3.qbuild.corp.qihoo.net:8360/nexus/content/repositories/mobilesafe_platform_snpashot"
-        }
+//        maven {
+//            url "http://s3.qbuild.corp.qihoo.net:8360/nexus/content/repositories/mobilesafe_platform_snpashot"
+//        }
     }
 }
 

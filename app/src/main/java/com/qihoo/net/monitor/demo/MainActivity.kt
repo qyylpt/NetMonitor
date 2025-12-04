@@ -1,8 +1,10 @@
 package com.qihoo.net.monitor.demo
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import com.qihoo.net.monitor.NetworkMonitor
 import com.qihoo.net.monitor.httpurl.MonitoredHttpURLConnection
@@ -25,15 +27,11 @@ class MainActivity : FragmentActivity() {
         NetworkMonitor.init(application)
         client = OkHttpClient.Builder().build()
         client1 = OkHttpClient().newBuilder().build()
-        findViewById<View>(R.id.monitor_request).setOnClickListener {
-            simulateOkhttp()
-            Thread {
-                Test.testHttpUrl()
-                simulateHttpUrl()
-                Test.testVolley(this@MainActivity)
-            }.start()
-        }
-
+        val view = findViewById<TextView>(R.id.monitor_request)
+        view.postDelayed({ simulateOkhttp() }, 1000)
+        view.postDelayed({ simulateHttpUrl() }, 3000)
+        view.postDelayed({ Test.testHttpUrl() }, 5000)
+        view.postDelayed({ Test.testVolley(this@MainActivity) }, 7000)
 
     }
 
