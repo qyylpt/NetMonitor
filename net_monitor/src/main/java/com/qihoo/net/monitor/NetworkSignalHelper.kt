@@ -10,6 +10,7 @@ class NetworkSignalHelper(context: Context) {
     private val telephonyManager: TelephonyManager =
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
     private var currentSignalStrength: Int? = null // 信号强度值（dBm）
+    private var isReleased = false // 标记是否已释放
 
     // 直接初始化信号监听器（解决未初始化问题）
     private val signalListener = object : PhoneStateListener() {
@@ -46,6 +47,14 @@ class NetworkSignalHelper(context: Context) {
 
     // 释放资源
     fun release() {
+        if (isReleased) {
+            return
+        }
         telephonyManager.listen(signalListener, PhoneStateListener.LISTEN_NONE)
+        isReleased = true
+    }
+
+    fun isReleased() : Boolean {
+        return isReleased
     }
 }
