@@ -18,13 +18,19 @@ dependencies {
 
 }
 
+//配置正式或者测试服务器,默认上传到测试服务器
+def isDev = true
+def verPrefix = "1.0.0"
+def repoUrl = isDev ? "http://s3.qbuild.corp.qihoo.net:8360/nexus/content/repositories/mobilesafe_platform_snpashot/" : "http://s3.qbuild.corp.qihoo.net:8360/nexus/content/repositories/mobilesafe_platform/"
+def ver = isDev ? "${verPrefix}-SNAPSHOT" : "$verPrefix"
+
+
 publishing {
     publications {
-        // 这里的 hello 可以任意命名
         NetMonitorPlugin(MavenPublication) {
-            groupId = 'com.qihoo.net.monitor.plugin'
+            groupId = 'com.qihoo.net.monitor'
             artifactId = 'net_monitor_plugin'
-            version = '12.0.0'
+            version = ver
             // 组件类型，我们的插件其实就是Java组件
             from components.java
         }
@@ -37,10 +43,10 @@ publishing {
         mavenLocal()
         // 远程Maven仓库（替换为你的仓库信息）
         maven {
-            url = uri('https://your-maven-repo-url') // 仓库URL
+            url = uri(repoUrl) // 仓库URL
             credentials {
-                username = 'your-username' // 用户名
-                password = 'your-password' // 密码
+                username = '' // 用户名
+                password = '' // 密码
             }
         }
     }

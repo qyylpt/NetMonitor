@@ -30,28 +30,24 @@ dependencies {
     api 'com.squareup.okhttp3:okhttp:3.10.0'
 }
 
+//配置正式或者测试服务器,默认上传到测试服务器
+def isDev = true
+def verPrefix = "1.0.0"
+def repoUrl = isDev ? "http://s3.qbuild.corp.qihoo.net:8360/nexus/content/repositories/mobilesafe_platform_snpashot/" : "http://s3.qbuild.corp.qihoo.net:8360/nexus/content/repositories/mobilesafe_platform/"
+def ver = isDev ? "${verPrefix}-SNAPSHOT" : "$verPrefix"
+
+
 // 配置Maven发布
 afterEvaluate {
     publishing {
         publications {
             // 创建一个名为release的发布
-            release(MavenPublication) {
+            NetMonitor(MavenPublication) {
                 // 关联Android库组件
-                from components.release
-
+                from isDev ? components.debug : components.release
                 groupId = 'com.qihoo.net.monitor'
                 artifactId = 'net_monitor'
-                version = android.defaultConfig.versionName
-            }
-
-            debug(MavenPublication) {
-                // 关联Android库组件
-                from components.debug
-
-                // 配置Maven坐标信息
-                groupId = 'com.qihoo.net.monitor'
-                artifactId = 'net_monitor_debug'
-                version = android.defaultConfig.versionName
+                version = ver
             }
         }
 
@@ -62,10 +58,10 @@ afterEvaluate {
 
             // 远程Maven仓库（替换为你的仓库信息）
             maven {
-                url = uri('https://your-maven-repo-url') // 仓库URL
+                url = uri(repoUrl) // 仓库URL
                 credentials {
-                    username = 'your-username' // 用户名
-                    password = 'your-password' // 密码
+                    username = '' // 用户名
+                    password = '' // 密码
                 }
             }
         }

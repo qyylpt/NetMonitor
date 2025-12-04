@@ -5,13 +5,16 @@ buildscript {
         google()
         mavenCentral()
         mavenLocal()
+//        maven {
+//            url "http://s3.qbuild.corp.qihoo.net:8360/nexus/content/repositories/mobilesafe_platform_snpashot"
+//        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:3.6.4"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
-        classpath "com.qihoo.net.monitor.plugin:net_monitor_plugin:12.0.0"
+        classpath "com.qihoo.net.monitor:net_monitor_plugin:1.0.0-SNAPSHOT"
     }
 }
 
@@ -21,6 +24,9 @@ allprojects {
         mavenCentral()
         jcenter() // Warning: this repository is going to shut down soon
         mavenLocal()
+        maven {
+            url "http://s3.qbuild.corp.qihoo.net:8360/nexus/content/repositories/mobilesafe_platform_snpashot"
+        }
     }
 }
 
